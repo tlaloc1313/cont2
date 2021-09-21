@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Create A task</title>
+  <link rel="stylesheet" href="/stylesheets/TaskStyle.css">
+</head>
+
+<body>
+
+<div id="Task">
+
+  <h1 class="homepage-heading">Create A task:</h1>
+  <form action="/tasks/create" method="post">
+    <br>
+        <label id="formlabel" for="Title">Enter task title:</label>
+    <br>
+        <input id="title" type="text" name="title" placeholder="Enter task title here..." required>
+    <br><br>
+        <label id="formlabel" for="Content">Enter task details:</label>
+    <br>
+        <textarea rows="4" cols="50" placeholder="Enter task details here..." name="description"></textarea>
+    <br><br>
+        <label id="formlabel" for="priority">Select task priority:</label>
+    <br>
+        <input type="date" id="start" name="date"
+            value="2018-07-22"
+            min="2018-01-01" max="2018-12-31">
+    <br>
+    <select name="priority">
+        <option value="1">1 &#9733</option>
+        <option value="2">2 &#9733</option>
+        <option value="3">3 &#9733</option>
+        <option value="4">4 &#9733</option>
+        <option value="5">5 &#9733</option>
+    </select>
+    <br><br>
+    <button type="submit">Submit</button>
+  </form>
+
+</div>
+
+
+</body>
+
+</html>
