@@ -1,0 +1,37 @@
+input{
+  padding: 10px;
+
+}
+
+#title
+{
+    width: 480px;
+}
+
+#formlabel
+{
+  color: red;
+  font-weight: bold;
+  font: 20px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+#Task{
+  color: red;
+  text-align: center;
+}
+
+h1{
+    font-family:"Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.content{
+  border-style: groove;
+  border-color: aquamarine;
+  border-radius: 5px;
+  padding: 2%;
+}
+
+textarea,
+input[type=text] {
+    font-family:"Lucida Grande", Helvetica, Arial, sans-serif;
+}

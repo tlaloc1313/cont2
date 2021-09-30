@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login Page</title>
+    <link rel="stylesheet" href="stylesheets/LoginStyles.css">
+  </head>
+  <script src="LoginScripts.js"></script>
+  <body>
+    <div class="outerDiv">
+      <form name="myForm" action="/login" method="post" onsubmit="return validateForm()" required>
+        <div class="title">Login</div>
+        <div class="input-box">
+          <input type="text" name="username" placeholder="Username">
+          <div class="underline" id="username_error"></div>
+        </div>
+        <div class="input-box">
+          <input type="password" name="password" placeholder="Password">
+          <div class="underline" id="password_error"></div>
+        </div>
+        <div class ="error-message">
+        </div>
+        <div class="input-box">
+          <input type="submit" value="Login" onclick="myFunction()"><br>
+        </div>
+        <div class ="sign-up-link">
+        <p> Not a member <a href="createUser.html">sign up here</a> </p>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
