@@ -117,7 +117,6 @@ router.post('/modify', function(res, req, next) {
             priority = ?,
             filepath = ?,
             description = ?
-
         WHERE
             idUsers = ?
             AND taskId = ?
