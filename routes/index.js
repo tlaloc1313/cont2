@@ -3,6 +3,27 @@ var password = require('password-hash-and-salt'); // npm install password-hash-a
 var router = express.Router();
 const util = require('util');
 var path = require('path');
+// import dbConnectionPool from "../app.js"; // get database reference
+const app = require('../app.js');
+
+
+
+
+async function getUser(username) {
+  const [rows] = await connection.promise().query(
+    `SELECT * 
+      FROM users 
+      WHERE username = ?`,
+    [username]
+  )
+
+  return rows[0]
+}
+
+
+
+
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
