@@ -6,13 +6,22 @@ var path = require('path');
 // import dbConnectionPool from "../app.js"; // get database reference
 const app = require('../app.js');
 
+var db = require('../database');
+
+
+var promisePool = db.promisePool;
+
+var getRows = db.getRows;
+
+const databaseCall = db.databaseCall;
+
 
 
 
 async function getUser(username) {
   const [rows] = await connection.promise().query(
-    `SELECT * 
-      FROM users 
+    `SELECT *
+      FROM users
       WHERE username = ?`,
     [username]
   )
@@ -21,7 +30,23 @@ async function getUser(username) {
 }
 
 
+async function hashString(user_password, hash) {
+    let promise = await new Promise ((resolve, reject) => {
 
+        password(user_password).verifyAgainst(hash, function(error, verified) {
+                if(error)
+                    throw new Error('Something went wrong!');
+                if(!verified) {
+                    console.log("Don't try! We got you!");
+                } else {
+                    console.log("Information verified!");
+                    console.log("original password is: " + user_password);
+                }
+            });
+    });
+
+    return promise;
+}
 
 
 
@@ -61,26 +86,26 @@ router.post('/signUp', function(req, res, next) {
             VALUES (?, ?, ?, ?);
             `;
 
-            //Connect to the database
-            req.pool.getConnection(function (err, connection) {
-                if (err) {
-                    res.sendStatus(500);
-                    return;
-                }
+            // //Connect to the database
+            // req.pool.getConnection(function (err, connection) {
+            //     if (err) {
+            //         res.sendStatus(500);
+            //         return;
+            //     }
 
-                connection.query(query, parameters, function (err, rows, fields) {
-                    connection.release(); // release connection
-                    if (err) {
-                        res.sendStatus(400);
-                        console.log(err);
-                        return;
-                    }
-                    // res.send("sign up succesful");
-                    res.redirect('/');
+            //     connection.query(query, parameters, function (err, rows, fields) {
+            //         connection.release(); // release connection
+            //         if (err) {
+            //             res.sendStatus(400);
+            //             console.log(err);
+            //             return;
+            //         }
+            //         // res.send("sign up succesful");
+            //         res.redirect('/');
 
-                });
-            });
-
+            //     });
+            // });
+             databaseCall(res, query, parameters);
 
 
         });
@@ -91,7 +116,7 @@ router.post('/signUp', function(req, res, next) {
 
 // handles login of users
 var user_id = 0; // temp until database is created
-router.post('/login', function(req, res, next) { // update to a post request for website integration when front end made
+router.post('/login', async function(req, res, next) { // update to a post request for website integration when front end made
 
     // delete session token if it exists
     if('user' in req.session) { // user is logged in - requires user to logout to get a new token
@@ -107,19 +132,22 @@ router.post('/login', function(req, res, next) { // update to a post request for
             WHERE username=?;
             `;
 
-            //Connect to the database
-            req.pool.getConnection(function (err, connection) {
-                if (err) {
-                    res.sendStatus(500);
-                    return;
-                }
+            // //Connect to the database
+            // req.pool.getConnection(function (err, connection) {
+            //     if (err) {
+            //         res.sendStatus(500);
+            //         return;
+            //     }
 
-                connection.query(query, parameters, function (err, rows, fields) {
-                    connection.release(); // release connection
-                    if (err) {
-                        res.sendStatus(400);
-                        return;
-                    }
+            //     connection.query(query, parameters, function (err, rows, fields) {
+            //         connection.release(); // release connection
+            //         if (err) {
+            //             res.sendStatus(400);
+            //             return;
+            //         }
+
+
+             let rows = await getRows(res, query, parameters);
 
                     // retrived info from sql table
                     var hash = rows[0].pwhash;
@@ -139,8 +167,8 @@ router.post('/login', function(req, res, next) { // update to a post request for
                             res.redirect('/home');
                         }
                     });
-                });
-            });
+            //     });
+            // });
 
 
         } else {

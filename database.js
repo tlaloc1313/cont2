@@ -37,7 +37,39 @@ const promisePool = pool.promise();
 //   }
 // };
 
-module.exports = promisePool;
+
+async function databaseCall (res, query, parameters) {
+    try {
+        const [rows] = await promisePool.query(query, parameters);
+         res.json(rows);
+    } catch (e) {
+        console.log(e);
+        if (e instanceof ER_BAD_FIELD_ERROR ) {
+            res.sendStatus(400);
+        } else {
+            res.sendStatus(500);
+        }
+    }
+}
+
+
+async function getRows (res, query, parameters) {
+    try {
+        const [rows] = await promisePool.query(query, parameters);
+         return rows;
+    } catch (e) {
+        console.log(e);
+        if (e instanceof ER_BAD_FIELD_ERROR ) {
+            res.sendStatus(400);
+        } else {
+            res.sendStatus(500);
+        }
+    }
+}
+
+
+
+module.exports = { promisePool, databaseCall, getRows};
 
 
 

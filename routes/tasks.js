@@ -2,7 +2,12 @@ var express = require('express');
 var router = express.Router();
 const util = require('util');
 
-var promisePool = require('../database');
+var db = require('../database');
+
+
+var promisePool = db.promisePool;
+
+const databaseCall = db.databaseCall;
 
 // // get the client
 // const mysql = require('mysql2');
@@ -15,6 +20,21 @@ var promisePool = require('../database');
 //     user: 'cont2db',
 //     password: 'ykyY1Q8vtyvJL'
 // });
+
+
+// async function databaseCall (res, query, parameters) {
+//     try {
+//         const [rows] = await promisePool.query(query, parameters);
+//          res.json(rows);
+//     } catch (e) {
+//         console.log(e);
+//         if (e instanceof ER_BAD_FIELD_ERROR ) {
+//             res.sendStatus(400);
+//         } else {
+//             res.sendStatus(500);
+//         }
+//     }
+// }
 
 /* GET tasks */
 // router.get('/', function(req, res, next) {
@@ -77,17 +97,20 @@ router.get('/', async (req, res) => {
     //         res.sendStatus(400);
     //     );
 
-    try {
-        const [rows] = await promisePool.query(query, parameters);
-         res.json(rows);
-    } catch (e) {
-        console.log(e);
-        if (e instanceof ER_BAD_FIELD_ERROR ) {
-            res.sendStatus(400);
-        } else {
-            res.sendStatus(500);
-        }
-    }
+    // try {
+    //     const [rows] = await promisePool.query(query, parameters);
+    //      res.json(rows);
+    // } catch (e) {
+    //     console.log(e);
+    //     if (e instanceof ER_BAD_FIELD_ERROR ) {
+    //         res.sendStatus(400);
+    //     } else {
+    //         res.sendStatus(500);
+    //     }
+    // }
+
+
+     databaseCall(res, query, parameters);
 
 });
 
@@ -101,23 +124,28 @@ router.post('/delete', function(req, res, next) {
         WHERE idTasks=? AND idUsers=?;
         `;
 
-        //Connect to the database
-        req.pool.getConnection(function (err, connection) {
-            if (err) {
-                res.sendStatus(500);
-                return;
-            }
+        databaseCall(res, query, parameters);
 
-            connection.query(query, parameters, function (err, rows, fields) {
-                connection.release(); // release connection
-                if (err) {
-                    res.sendStatus(400);
-                    return;
-                }
+        // //Connect to the database
+        // req.pool.getConnection(function (err, connection) {
+        //     if (err) {
+        //         res.sendStatus(500);
+        //         return;
+        //     }
 
-                res.sendStatus(200);
-            });
-        });
+        //     connection.query(query, parameters, function (err, rows, fields) {
+        //         connection.release(); // release connection
+        //         if (err) {
+        //             res.sendStatus(400);
+        //             return;
+        //         }
+
+        //         res.sendStatus(200);
+        //     });
+        // });
+
+
+
     } else {
         res.status(400).send("requires a task id");
     }
@@ -134,25 +162,27 @@ router.post('/create', function(req,res,next) {
         VALUES (?, ?, ?, ?, ?, NULL);
         `;
 
-        //Connect to the database
-        req.pool.getConnection(function (err, connection) {
-            if (err) {
-                res.sendStatus(500);
-                return;
-            }
+        // //Connect to the database
+        // req.pool.getConnection(function (err, connection) {
+        //     if (err) {
+        //         res.sendStatus(500);
+        //         return;
+        //     }
 
-            connection.query(query, parameters, function (err, rows, fields) {
-                connection.release(); // release connection
-                if (err) {
-                    res.sendStatus(400);
-                    return;
-                }
+        //     connection.query(query, parameters, function (err, rows, fields) {
+        //         connection.release(); // release connection
+        //         if (err) {
+        //             res.sendStatus(400);
+        //             return;
+        //         }
 
-                // res.sendStatus(200);
-                res.redirect('/home');
+        //         // res.sendStatus(200);
+        //         res.redirect('/home');
 
-            });
-        });
+        //     });
+        // });
+
+         databaseCall(res, query, parameters);
     } else {
         res.status(400).send("check inputs in req.body");
     }
@@ -177,23 +207,25 @@ router.post('/modify', function(res, req, next) {
             AND taskId = ?
         `;
 
-        //Connect to the database
-        req.pool.getConnection(function (err, connection) {
-            if (err) {
-                res.sendStatus(500);
-                return;
-            }
+        // //Connect to the database
+        // req.pool.getConnection(function (err, connection) {
+        //     if (err) {
+        //         res.sendStatus(500);
+        //         return;
+        //     }
 
-            connection.query(query, parameters, function (err, rows, fields) {
-                connection.release(); // release connection
-                if (err) {
-                    res.sendStatus(400);
-                    return;
-                }
+        //     connection.query(query, parameters, function (err, rows, fields) {
+        //         connection.release(); // release connection
+        //         if (err) {
+        //             res.sendStatus(400);
+        //             return;
+        //         }
 
-                res.sendStatus(200);
-            });
-        });
+        //         res.sendStatus(200);
+        //     });
+        // });
+
+         databaseCall(res, query, parameters);
 
     } else {
         res.status(400).send("check inputs in req.body");
