@@ -12,6 +12,12 @@ var session = require('express-session');    // allow sessions
 
 var app = express();
 
+// npm install --save-dev jest  -for unit tests
+// npm install jest --global
+// npm install --save-dev jest supertest
+
+// npm install --save mysql2
+
 // Session establishing code
 // npm install express-mysql-session --save
 app.use(session({
@@ -34,6 +40,19 @@ var dbConnectionPool = mysql.createPool({
 
 });
 
+var mysql2 = require('mysql2');
+
+
+var pool = mysql2.createPool({
+    host: 'aajf9aopbg4qnz.cjtdffwweqyc.us-east-2.rds.amazonaws.com',
+    port: '3306',
+    database: 'ebdb',
+    user: 'cont2db',
+    password: 'ykyY1Q8vtyvJL'
+});
+
+// const mysql = require('mysql2')
+
 // database middleware
 app.use(function(req, res, next) {
     req.pool = dbConnectionPool;
@@ -50,6 +69,13 @@ app.use(express.static(path.join(__dirname, 'public'), {index: 'Login.html'}));
 // router extentions which are open to a user
 // without a valid session token
 app.use('/', indexRouter);
+
+
+app.use('/apptest', (req, res, next) => {
+
+    res.send(200);
+
+});
 
 // session token blocking middleware
 // only logged in users are allowed past this middleware

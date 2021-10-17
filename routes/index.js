@@ -3,28 +3,38 @@ var password = require('password-hash-and-salt'); // npm install password-hash-a
 var router = express.Router();
 const util = require('util');
 var path = require('path');
+const app = require('../app.js');
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+var db = require('../database');
 
-// allows a user to sign up
-router.post('/signUp', function(req, res, next) {
-    if('username' in req.body && 'password' in req.body && 'email' in req.body) {
-        // var parameters = [req.body.user_name, req.body.password];
-        var user_password = req.body.password;
-        // // Creating hash and salt
-        password(req.body.password).hash(function(error, hash) {
-            if(error)
-                throw new Error('Something went wrong!');
 
-            var parameters = [req.body.username, hash, "test_name_currently_not_used", req.body.email];
+var promisePool = db.promisePool;
 
-            console.log(hash);
+var getRows = db.getRows;
 
-            // remove this code in final version
-            password(user_password).verifyAgainst(hash, function(error, verified) {
+var insert = db.insert;
+
+const databaseCall = db.databaseCall;
+
+
+
+
+async function getUser(username) {
+  const [rows] = await connection.promise().query(
+    `SELECT *
+      FROM users
+      WHERE username = ?`,
+    [username]
+  )
+
+  return rows[0]
+}
+
+
+async function hashString(user_password, hash) {
+    let promise = await new Promise ((resolve, reject) => {
+
+        password(user_password).verifyAgainst(hash, function(error, verified) {
                 if(error)
                     throw new Error('Something went wrong!');
                 if(!verified) {
@@ -34,35 +44,94 @@ router.post('/signUp', function(req, res, next) {
                     console.log("original password is: " + user_password);
                 }
             });
+    });
 
-            var query = `
-            INSERT INTO Users (username, pwhash, name, emailaddress)
-            VALUES (?, ?, ?, ?);
-            `;
-
-            //Connect to the database
-            req.pool.getConnection(function (err, connection) {
-                if (err) {
-                    res.sendStatus(500);
-                    return;
-                }
-
-                connection.query(query, parameters, function (err, rows, fields) {
-                    connection.release(); // release connection
-                    if (err) {
-                        res.sendStatus(400);
-                        console.log(err);
-                        return;
-                    }
-                    // res.send("sign up succesful");
-                    res.redirect('/');
-
-                });
-            });
+    return promise;
+}
 
 
 
-        });
+/* GET home page. */
+router.get('/', function(req, res, next) {
+  res.render('index', { title: 'Express' });
+});
+
+
+async function getHash(newPassword) {
+  return new Promise((resolve, reject) => {
+
+      password(newPassword).hash(function(error, hash) {
+            if(error)
+                // throw new Error('Something went wrong!');
+
+                reject(error);
+            else {
+                resolve(hash);
+            }
+    });
+  });
+}
+
+
+async function verify(user_password, hash) {
+  return new Promise((resolve, reject) => {
+
+      password(user_password).verifyAgainst(hash, function(error, verified) {
+            if(error) {
+                reject(error);
+            } else {
+                resolve(hash);
+            }
+    });
+  });
+}
+
+// allows a user to sign up
+router.post('/signUp', async function(req, res, next) {
+    if('username' in req.body && 'password' in req.body && 'email' in req.body) {
+        // var parameters = [req.body.user_name, req.body.password];
+        var user_password = req.body.password;
+        var verified;
+        var hash;
+
+        try {
+            hash = await getHash(req.body.password);
+            console.log(hash);
+            console.log("here1");
+
+            verified = await verify(user_password, hash);
+
+
+            console.log("here2");
+
+             if(verified) {
+
+                  var query = `
+                INSERT INTO Users (username, pwhash, name, emailaddress)
+                VALUES (?, ?, ?, ?);
+                `;
+
+                var parameters = [req.body.username, hash, "test_name_currently_not_used", req.body.email];
+
+
+
+                await insert(query, parameters);
+
+                console.log("here3");
+
+
+                res.redirect('/');
+
+             } else {
+                 throw err;
+             }
+
+
+
+        } catch (err) {
+            res.status(400).send();
+        }
+
     } else {
         res.status(400).send("requires user_name and password parameters in request body");
     }
@@ -70,7 +139,7 @@ router.post('/signUp', function(req, res, next) {
 
 // handles login of users
 var user_id = 0; // temp until database is created
-router.post('/login', function(req, res, next) { // update to a post request for website integration when front end made
+router.post('/login', async function(req, res, next) { // update to a post request for website integration when front end made
 
     // delete session token if it exists
     if('user' in req.session) { // user is logged in - requires user to logout to get a new token
@@ -86,41 +155,29 @@ router.post('/login', function(req, res, next) { // update to a post request for
             WHERE username=?;
             `;
 
-            //Connect to the database
-            req.pool.getConnection(function (err, connection) {
-                if (err) {
-                    res.sendStatus(500);
-                    return;
+
+            let rows = await getRows(res, query, parameters);
+
+            // retrived info from sql table
+            var hash = rows[0].pwhash;
+
+            try {
+                var verified = await verify(user_password, hash);
+                if(verified) {
+
+                    req.session.user = rows[0].idUsers;
+                    console.log("User id set to: " + req.session.user);
+                    res.redirect('/home');
+
+                } else {
+                     console.log("Don't try! We got you!");
+                    res.status(400).send("denied");
+
                 }
 
-                connection.query(query, parameters, function (err, rows, fields) {
-                    connection.release(); // release connection
-                    if (err) {
-                        res.sendStatus(400);
-                        return;
-                    }
-
-                    // retrived info from sql table
-                    var hash = rows[0].pwhash;
-                    // time to verify information
-                    password(user_password).verifyAgainst(hash, function(error, verified) {
-                        if(error) {
-                            throw new Error('Something went wrong!');
-                            // res.sendStatus(500);
-                        }
-                        if(!verified) {
-                            console.log("Don't try! We got you!");
-                            res.status(400).send("denied");
-                        } else {
-                            console.log("Information verified!");
-                            req.session.user = rows[0].idUsers;
-                            console.log("User id set to: " + req.session.user);
-                            res.redirect('/home');
-                        }
-                    });
-                });
-            });
-
+            } catch (err) {
+                res.sendStatus(500);
+            }
 
         } else {
             res.status(400).send("requires user_name and password parameters in request body");
