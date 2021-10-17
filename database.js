@@ -52,6 +52,14 @@ async function databaseCall (res, query, parameters) {
     }
 }
 
+async function insert(query, parameters) {
+    try {
+      await promisePool.query(query, parameters);
+    } catch (e) {
+     throw Error(error);
+    }
+}
+
 
 async function getRows (res, query, parameters) {
     try {
@@ -69,7 +77,7 @@ async function getRows (res, query, parameters) {
 
 
 
-module.exports = { promisePool, databaseCall, getRows};
+module.exports = { promisePool, databaseCall, getRows, insert};
 
 
 
