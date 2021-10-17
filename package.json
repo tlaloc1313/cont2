@@ -3,17 +3,27 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "test": "jest",
+    "test:watch": "npm run test -- --watch"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
-    "express": "^4.16.4",
-    "express-session": "^1.17.2",
-    "jade": "^1.11.0",
+    "express": "~4.16.1",
+    "express-mysql-session": "^2.1.7",
     "morgan": "~1.9.1",
-    "mysql": "^2.18.1",
-    "password-hash-and-salt": "^0.1.4",
-    "pug": "^3.0.2"
+    "mysql2": "^2.3.0",
+    "password-hash-and-salt": "^0.1.4"
+  },
+  "devDependencies": {
+    "jest": "^27.2.4",
+    "supertest": "^6.1.6"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   }
 }

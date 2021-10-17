@@ -3,7 +3,6 @@ var password = require('password-hash-and-salt'); // npm install password-hash-a
 var router = express.Router();
 const util = require('util');
 var path = require('path');
-// import dbConnectionPool from "../app.js"; // get database reference
 const app = require('../app.js');
 
 var db = require('../database');
@@ -87,55 +86,6 @@ async function verify(user_password, hash) {
   });
 }
 
-
-// async function verify(user_password, hash) {
-//     return new Promise((resolve, reject) => {
-
-//      password(user_password).verifyAgainst(hash, function(error, verified) {
-
-
-//             //     if(error)
-//             //     // throw new Error('Something went wrong!');
-
-//             //     reject(error);
-//             //     else {
-//             //         function(resolve) {
-//             //             if(!verified) {
-//             //                 return false;
-//             //             } else {
-//             //                 return true;
-//             //             }
-//             //         }
-//             //     }
-
-//             // );
-
-
-//             if(error)
-//                 // throw new Error('Something went wrong!');
-
-//                 reject(error);
-//             else {
-//                 resolve(verified);
-//             }
-
-//                 // if(error) {
-//                 //     // throw new Error('Something went wrong!');
-//                 //      console.log('Something went wrong!');
-//                 //     reject(error);
-//                 // // } else if(!verified) {
-//                 // //     console.log("Don't try! We got you!");
-//                 // //     resolve(false);
-//                 // } else {
-//                 //     console.log("Information verified!");
-//                 //     console.log("original password is: " + user_password);
-//                 //     // resolve(true);
-//                 //      resolve(verified);
-//                 // }
-//          });
-//     });
-// }
-
 // allows a user to sign up
 router.post('/signUp', async function(req, res, next) {
     if('username' in req.body && 'password' in req.body && 'email' in req.body) {
@@ -144,26 +94,10 @@ router.post('/signUp', async function(req, res, next) {
         var verified;
         var hash;
 
-        // let hash = await getHash(req.body.password);
-        // var hash;
-        // getHash(req.body.password).then(data => (hash = data)).catch(throw err);
-
-
         try {
             hash = await getHash(req.body.password);
             console.log(hash);
             console.log("here1");
-
-            // password(user_password).verifyAgainst(hash, function(error, verified) {
-            //     if(error)
-            //         throw new Error('Something went wrong!');
-            //     if(!verified) {
-            //         console.log("Don't try! We got you!");
-            //     } else {
-            //         console.log("Information verified!");
-            //         console.log("original password is: " + user_password);
-            //     }
-            //  });
 
             verified = await verify(user_password, hash);
 
@@ -198,117 +132,6 @@ router.post('/signUp', async function(req, res, next) {
             res.status(400).send();
         }
 
-
-
-        //      console.log("here2");
-
-        //      if(verified) {
-
-        //           var query = `
-        //         INSERT INTO Users (username, pwhash, name, emailaddress)
-        //         VALUES (?, ?, ?, ?);
-        //         `;
-
-        //         var parameters = [req.body.username, hash, "test_name_currently_not_used", req.body.email];
-
-
-
-        //         databaseCall(res, query, parameters);
-
-        //         console.log("here3");
-
-
-        //         res.redirect('/');
-
-        //     //  } else {
-        //     //      res.status(400);
-        //     //  }
-
-
-
-        // } catch (e) {
-        //     res.status(400);
-        // }
-
-
-
-
-        // console.log(testHash + " it works!!")
-
-        // password(user_password).verifyAgainst(hash, function(error, verified) {
-        //     if(error)
-        //         throw new Error('Something went wrong!');
-        //     if(!verified) {
-        //         console.log("Don't try! We got you!");
-        //     } else {
-        //         console.log("Information verified!");
-        //         console.log("original password is: " + user_password);
-        //     }
-        // });
-
-
-        // var query = `
-        //     INSERT INTO Users (username, pwhash, name, emailaddress)
-        //     VALUES (?, ?, ?, ?);
-        //     `;
-
-        // databaseCall(res, query, parameters);
-
-        // res.redirect('/');
-
-
-
-        // // // Creating hash and salt
-        // password(req.body.password).hash(function(error, hash) {
-        //     if(error)
-        //         throw new Error('Something went wrong!');
-
-        //     var parameters = [req.body.username, hash, "test_name_currently_not_used", req.body.email];
-
-        //     console.log(hash);
-
-        //     // remove this code in final version
-        //     password(user_password).verifyAgainst(hash, function(error, verified) {
-        //         if(error)
-        //             throw new Error('Something went wrong!');
-        //         if(!verified) {
-        //             console.log("Don't try! We got you!");
-        //         } else {
-        //             console.log("Information verified!");
-        //             console.log("original password is: " + user_password);
-        //         }
-        //     });
-
-        //     var query = `
-        //     INSERT INTO Users (username, pwhash, name, emailaddress)
-        //     VALUES (?, ?, ?, ?);
-        //     `;
-
-        //     // //Connect to the database
-        //     // req.pool.getConnection(function (err, connection) {
-        //     //     if (err) {
-        //     //         res.sendStatus(500);
-        //     //         return;
-        //     //     }
-
-        //     //     connection.query(query, parameters, function (err, rows, fields) {
-        //     //         connection.release(); // release connection
-        //     //         if (err) {
-        //     //             res.sendStatus(400);
-        //     //             console.log(err);
-        //     //             return;
-        //     //         }
-        //     //         // res.send("sign up succesful");
-        //     //         res.redirect('/');
-
-        //     //     });
-        //     // });
-        //      databaseCall(res, query, parameters);
-
-        // res.status(400).send("updating");
-
-
-        // });
     } else {
         res.status(400).send("requires user_name and password parameters in request body");
     }
@@ -332,64 +155,29 @@ router.post('/login', async function(req, res, next) { // update to a post reque
             WHERE username=?;
             `;
 
-            // //Connect to the database
-            // req.pool.getConnection(function (err, connection) {
-            //     if (err) {
-            //         res.sendStatus(500);
-            //         return;
-            //     }
 
-            //     connection.query(query, parameters, function (err, rows, fields) {
-            //         connection.release(); // release connection
-            //         if (err) {
-            //             res.sendStatus(400);
-            //             return;
-            //         }
+            let rows = await getRows(res, query, parameters);
 
+            // retrived info from sql table
+            var hash = rows[0].pwhash;
 
-             let rows = await getRows(res, query, parameters);
+            try {
+                var verified = await verify(user_password, hash);
+                if(verified) {
 
-                    // retrived info from sql table
-                    var hash = rows[0].pwhash;
+                    req.session.user = rows[0].idUsers;
+                    console.log("User id set to: " + req.session.user);
+                    res.redirect('/home');
 
-                    try {
-                        var verified = await verify(user_password, hash);
-                        if(verified) {
+                } else {
+                     console.log("Don't try! We got you!");
+                    res.status(400).send("denied");
 
-                            req.session.user = rows[0].idUsers;
-                            console.log("User id set to: " + req.session.user);
-                            res.redirect('/home');
+                }
 
-                        } else {
-                             console.log("Don't try! We got you!");
-                            res.status(400).send("denied");
-
-                        }
-
-                    } catch (err) {
-                        res.sendStatus(500);
-                    }
-                    // // time to verify information
-                    // password(user_password).verifyAgainst(hash, function(error, verified) {
-                    //     if(error) {
-                    //         throw new Error('Something went wrong!');
-                    //         // res.sendStatus(500);
-                    //     }
-                    //     if(!verified) {
-                    //         console.log("Don't try! We got you!");
-                    //         res.status(400).send("denied");
-                    //     } else {
-                    //         console.log("Information verified!");
-                    //         req.session.user = rows[0].idUsers;
-                    //         console.log("User id set to: " + req.session.user);
-                    //         res.redirect('/home');
-                    //     }
-                    // });
-            //     });
-            // });
-
-
-
+            } catch (err) {
+                res.sendStatus(500);
+            }
 
         } else {
             res.status(400).send("requires user_name and password parameters in request body");
