@@ -58,6 +58,7 @@ router.post('/create', function(req,res,next) {
     } else {
         res.status(400).send("check inputs in req.body");
     }
+    res.redirect('/home');
 });
 
 router.post('/modify', function(res, req, next) {

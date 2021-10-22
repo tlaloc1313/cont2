@@ -35,3 +35,23 @@ textarea,
 input[type=text] {
     font-family:"Lucida Grande", Helvetica, Arial, sans-serif;
 }
+
+table{
+  
+  padding: 10px,10px,10px,10px;
+  outline-style:groove;
+  outline-width: 3px;
+}
+
+tr{
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  outline-style: dotted;
+  outline-width: 1px;
+}
+
+td{
+  padding-right: 30px;
+}
