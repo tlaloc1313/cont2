@@ -1,6 +1,8 @@
 function getTasks(){
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
+        //xhttp.open("GET", "/tasks", true);
+        //xhttp.send();
         if (this.readyState == 4 && this.status == 200) {
             var table = document.getElementById("mytasks");
             var tasksList = JSON.parse(this.responseText);
